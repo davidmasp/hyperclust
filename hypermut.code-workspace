@@ -2,6 +2,12 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "C:\\Users\\dmas\\projects\\clustMut"
+		},
+		{
+			"path": "C:\\Users\\dmas\\projects\\genomicHelpersDMP"
 		}
 	],
 	"settings": {}
