@@ -6,6 +6,9 @@ mode = params.dataset
 
 params.index = "index.csv"
 
+params.stratification = true
+params.pyclone = false
+
 // prepare master channel
 Channel
     .fromPath(params.index)
@@ -33,7 +36,7 @@ process formatVCF{
         bcftools query -i 'TYPE="snp"' \
                         -s ${id} \
                         -f '%CHROM:%POS:%REF:%ALT{0},%REF,%ALT{0},[%AD]\n' \
-                        ${vcf} | parse_query_pcawg_sanger.awk > ${id}.tmpFile
+                        ${vcf} | parse_query_pcawg_sanger.awk -F "," > ${id}.tmpFile
 
         annotate_cna.R ${vcf} ${cna} ${id}.tmpFile hartwig ${id}
 
