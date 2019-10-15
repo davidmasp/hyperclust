@@ -1,0 +1,32 @@
+# Nextflow files
+.nextflow.log*
+.nextflow.pid
+.nextflow/
+*.html*
+
+# input data
+index*.csv
+
+# output data
+results/
+results* 
+
+# singularity
+*.sif
+*.simg
+*.img
+
+# temporal files
+work/
+*.bam
+*.seqz.gz
+*.seqz.gz.tbi
+
+bin/*_seqz_output*
+bin/*.png
+bin/*.dot
+
+.Rproj.user
+*.seqz.gz*
+
+
