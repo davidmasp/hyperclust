@@ -40,7 +40,7 @@ process formatVCF{
         bcftools query -i 'TYPE="snp"' \
                         -s ${id} \
                         -f '%CHROM:%POS:%REF:%ALT{0},%REF,%ALT{0},[%AD]\n' \
-                        ${id}_snp.vcf | parse_query_hartwig.awk > ${id}.tmpFile
+                        ${id}_snp.vcf.gz | parse_query_hartwig.awk > ${id}.tmpFile
 
 
         annotate_cna.R ${id}_snp.vcf.gz ${cna} ${id}.tmpFile hartwig ${id}
