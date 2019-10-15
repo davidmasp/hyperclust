@@ -35,7 +35,7 @@ process formatVCF{
         """
         # this is mixed vcf with indels
         # I should filter by PASS?
-        bcftools view -i 'TYPE="snp"' -O z -o ${id}_snp.vcf.gz
+        bcftools view -i 'TYPE="snp"' -O z -o ${id}_snp.vcf.gz ${vcf}
 
         bcftools query -i 'TYPE="snp"' \
                         -s ${id}_snp.vcf \
