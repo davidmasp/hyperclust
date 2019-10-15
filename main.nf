@@ -33,12 +33,17 @@ process formatVCF{
     script:
     if (mode == "hartwig")
         """
-        bcftools query -i 'TYPE="snp"' \
-                        -s ${id} \
-                        -f '%CHROM:%POS:%REF:%ALT{0},%REF,%ALT{0},[%AD]\n' \
-                        ${vcf} | parse_query_hartwig.awk -F "," > ${id}.tmpFile
+        # this is mixed vcf with indels
+        # I should filter by PASS?
+        bcftools view -i 'TYPE="snp"' -O z -o ${id}_snp.vcf.gz
 
-        annotate_cna.R ${vcf} ${cna} ${id}.tmpFile hartwig ${id}
+        bcftools query -i 'TYPE="snp"' \
+                        -s ${id}_snp.vcf \
+                        -f '%CHROM:%POS:%REF:%ALT{0},%REF,%ALT{0},[%AD]\n' \
+                        ${vcf} | parse_query_hartwig.awk > ${id}.tmpFile
+
+
+        annotate_cna.R ${id}_snp.vcf.gz ${cna} ${id}.tmpFile hartwig ${id}
 
         rm ${id}.tmpFile
         """

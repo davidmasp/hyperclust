@@ -29,4 +29,5 @@ bin/*.dot
 .Rproj.user
 *.seqz.gz*
 
+tmp_files/
 

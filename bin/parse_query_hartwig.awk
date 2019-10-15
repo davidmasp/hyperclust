@@ -1,6 +1,7 @@
 #!/usr/bin/awk -f
 
 BEGIN {
+    FS=","
     OFS="\t"
     print("mutation_id","ref_counts","var_counts","normal_cn")
 }
