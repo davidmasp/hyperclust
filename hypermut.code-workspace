@@ -8,6 +8,12 @@
 		},
 		{
 			"path": "C:\\Users\\dmas\\projects\\genomicHelpersDMP"
+		},
+		{
+			"path": "C:\\Users\\dmas\\projects\\clustmut-pipe"
+		},
+		{
+			"path": "C:\\Users\\dmas\\projects\\randomize-muts-nf"
 		}
 	],
 	"settings": {}
