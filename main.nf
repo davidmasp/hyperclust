@@ -38,9 +38,9 @@ process formatVCF{
         bcftools view -i 'TYPE="snp"' -O z -o ${id}_snp.vcf.gz ${vcf}
 
         bcftools query -i 'TYPE="snp"' \
-                        -s ${id}_snp.vcf \
+                        -s ${id} \
                         -f '%CHROM:%POS:%REF:%ALT{0},%REF,%ALT{0},[%AD]\n' \
-                        ${vcf} | parse_query_hartwig.awk > ${id}.tmpFile
+                        ${id}_snp.vcf | parse_query_hartwig.awk > ${id}.tmpFile
 
 
         annotate_cna.R ${id}_snp.vcf.gz ${cna} ${id}.tmpFile hartwig ${id}
