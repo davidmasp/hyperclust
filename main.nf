@@ -283,6 +283,8 @@ process merge {
     """
 }
 
+randomized_files.subscribe{println it}
+
 if( params.clonal ) {
     boosting_ch = results_stratification_strand_clonality
 }
@@ -290,7 +292,7 @@ else {
     println "This option is still not implemented"
 }
 
-randomized_files.subscribe{println it}
+
 /*
 samples_boosting_ch = boosting_ch.join(randomized_files)
 
