@@ -262,7 +262,7 @@ process merge {
     set id, file(edited_files) from grouped_files
 
     output:
-    set id, file('*.randomized.tsv') into randomized_files 
+    set id, file('${id}_w${params.ws}.randomized.tsv') into randomized_files 
 
     script:
     """
