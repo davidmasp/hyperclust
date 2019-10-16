@@ -268,7 +268,7 @@ process merge {
     """
     #!/bin/bash
     # obtained from https://stackoverflow.com/questions/24641948
-    OutFileName=${prefix}_w${params.ws}.randomized.tsv
+    OutFileName=${id}_w${params.ws}.randomized.tsv
     i=0                                       # Reset a counter
     for filename in ${edited_files} ; do 
         if [ "\$filename"  != "\$OutFileName" ] ;      # Avoid recursion 
