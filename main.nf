@@ -151,7 +151,7 @@ process formatRND{
     script:
     """
     cut -f 1 ${mutsFile} | tail -n +2 | \
-        awk 'BEGIN {FS=":";OFS="\t"} {print(\$1,\$2,\$2,\$3,\$4,1,$id)}' > \
+        awk 'BEGIN {FS=":";OFS="\t"} {print(\$1,\$2,\$2,\$3,\$4,1,"$id")}' > \
         ${id}_rndFormat.tsv 
 
     """
