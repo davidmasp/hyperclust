@@ -1,6 +1,8 @@
 #!~/bin/nextflow
 
 // params
+
+// A) stratifications
 params.dataset = "hartwig"
 mode = params.dataset
 
@@ -8,6 +10,17 @@ params.index = "index.csv"
 
 params.stratification = true
 params.pyclone = false
+
+
+// b) randommut
+params.genome = "/g/strcombio/fsupek_data/users/dmas/data/ILUMINA_refseq/GRCh37/GRCh37_refseq_masked.fa"
+params.assembly = "GRCh37"
+genome = file(params.genome) // file here bc only 1!
+params.batchsize = 10000
+params.intraBS = 100
+params.ws = 500000
+params.times = 50
+
 
 // prepare master channel
 Channel
@@ -17,7 +30,7 @@ Channel
                      file(row.vcfFile),
                      file(row.cnaFile),
                      row.purity) }
-    .set { samples_ch }
+    .set{ samples_ch}
 
 
 process formatVCF{
@@ -62,7 +75,8 @@ process formatVCF{
 }
 
 
-pyclone_format_ch.into{pyclone_master_ch; stratification_master_ch }
+pyclone_format_ch.into{pyclone_master_ch; stratification_master_ch;  samples2_ch}
+
 process pyClone{
     publishDir "$params.outdir"
     label 'pyClone'
@@ -123,6 +137,148 @@ process computeStratification {
 }
 
 
+/*
+ * prepare input from the pyclone format
+ */
+process formatRND{
+    publishDir "TMP/"
+    input: 
+    set id, file(mutsFile), val(purity) from samples2_ch
 
+    output:
+    set id, file("${id}_rndFormat.tsv") into mutsfiles
+    
+    script:
+    """
+    cut -f 1 ${mutsFile} | tail -n +2 | \
+        awk 'BEGIN {FS=":";OFS="\t"} {print(\$1,\$2,\$2,\$3,\$4,1,$id)}' > \
+        ${id}_rndFormat.tsv 
+
+    """
+}
+
+/*
+ * serialize the input genome
+ */
+process serialize_genome {
+    publishDir "TMP/"
+    conda '/g/strcombio/fsupek_home/dmas/ENV/py36'
+    afterScript 'set +u; conda deactivate'
+    input:
+    file "${params.assembly}.fa" from genome
+
+    output:
+    file "${params.assembly}.fa.p" into serial_genome
+    file "available_chromosomes.txt" into available_chromosomes
+
+    """
+    python -m randommut -M serialize -g ${params.assembly}.fa -a ${params.assembly}
+
+    egrep ">" ${params.assembly}.fa | sed 's/>//' > available_chromosomes.txt
+    """
+}
+
+/*
+ * Remove duplicated positions
+ */
+process rmdup {
+    publishDir 'TMP/'  
+
+    tag "${big_file_dups}"
+
+    input:
+    file big_file_dups from mutsfiles
+    file available from available_chromosomes
+
+    output:
+    file "${big_file_dups.baseName}_rmdup.tsv" into bigfiles_rmdup
+
+    """
+    egrep -f $available $big_file_dups | sort -k7,7 -k1,1 -k2n,2 -k5,5  | uniq > ${big_file_dups.baseName}_rmdup.tsv
+    """
+}
+
+/*
+ * Split input mut files
+ */
+process split {
+    publishDir 'TMP/'  
+
+    tag "${big_file}"
+
+    input:
+    file big_file from bigfiles_rmdup
+
+    output:
+    file "${big_file}*" into split_files mode flatten
+
+    """
+    split -d -l ${params.batchsize} $big_file $big_file
+    """
+} // the second bigfile here is to work as prefix!
+
+/*
+ * Randomize splited file
+ */
+process randomize {
+    publishDir 'TMP/' 
+    label 'py36'
+    
+    tag "${partial}"
+
+    input:
+    file genome from serial_genome
+    file(partial) from split_files
+
+    output:
+    file "${partial}.randomized" into edited_files
+
+    script:
+    """
+    python -m randommut -M randomize -g ${genome} -m ${partial} -a ${params.assembly} -o ${partial}.randomized -t ${params.times} -w ${params.ws} -b ${params.intraBS}
+    """
+}
+
+/*
+ * group back the channel
+ */
+edited_files
+  .map { file -> tuple( file.name.toString() - ~/([0-9]+)?(\.randomized)?$/ , file) }
+  .groupTuple()
+  .set { grouped_files }
+
+
+/*
+ * merge back output files 
+ */
+process merge {
+    publishDir 'results/'
+
+    tag "${prefix}"
+
+    input:
+    set prefix, file(edited_files) from grouped_files
+
+    output:
+    file '*.randomized.tsv' into final_file 
+
+    script:
+    """
+    #!/bin/bash
+    # obtained from https://stackoverflow.com/questions/24641948
+    OutFileName=${prefix}_w${params.ws}.randomized.tsv
+    i=0                                       # Reset a counter
+    for filename in ${edited_files} ; do 
+        if [ "\$filename"  != "\$OutFileName" ] ;      # Avoid recursion 
+        then 
+        if [[ \$i -eq 0 ]] ; then 
+            head -1  \$filename >   \$OutFileName # Copy header 
+        fi
+        tail -n +2  \$filename >>  \$OutFileName # Append from the 2nd line
+        i=\$(( \$i + 1 ))                        # Increase the counter
+    fi
+    done
+    """
+}
 
 
