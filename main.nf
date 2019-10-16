@@ -213,11 +213,13 @@ process split {
     """
 } // the second bigfile here is to work as prefix!
 
-split_files.subscribe{println it}
+// check how the chanell looks like
+// chanel of tuples with [id,splitfile]
+// after we would need to groupTuple
+
+// run split_files.subscribe{println it}
 
 
-
-/*
 //Randomize splited file
 process randomize {
     publishDir 'TMP/' 
@@ -227,10 +229,10 @@ process randomize {
 
     input:
     file genome from serial_genome
-    file(partial) from split_files
+    set id, file(partial) from split_files
 
     output:
-    file "${partial}.randomized" into edited_files
+    set id, file("${partial}.randomized") into edited_files
 
     script:
     """
@@ -238,15 +240,10 @@ process randomize {
     """
 }
  
-
 //group back the channel
-
 edited_files
-  .map { file -> tuple( file.name.toString() - ~/([0-9]+)?(\.randomized)?$/ , file) }
   .groupTuple()
   .set { grouped_files }
-
-
 
 // merge back output files 
 process merge {
@@ -278,5 +275,5 @@ process merge {
     done
     """
 }
- */
+
 
