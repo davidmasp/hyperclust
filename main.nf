@@ -22,6 +22,13 @@ params.ws = 500000
 params.times = 50
 
 
+// c) clustmut
+// ideally the combination of these channels should make all boosts
+// TODO: add non-clonal stratification here too
+params.pairs = true
+params.strand = true
+params.clonal = true
+
 // prepare master channel
 Channel
     .fromPath(params.index)
@@ -125,7 +132,9 @@ process computeStratification {
 
     output:
     set id, file("clonality_plots/${id}_clonality_ratio.pdf") into results_stratification_plots
-    set id, file("clonality_results/${id}_mutations_strand_clonality.txt") into results_stratification
+    set id, file("clonality_results/${id}_mutations_strand_clonality.txt") into results_stratification_strand_clonality
+    set id, file("clonality_results/${id}_mutations_pair_clonality.txt") into results_stratification_pair_clonality
+    set id, file("clonality_results/${id}_mutations_clonality.txt") into results_stratification_clonality
 
     when:
     params.stratification
@@ -135,8 +144,6 @@ process computeStratification {
     clonality_single_sample.R -Pv -i $input_file -p $purity -s $id
     """
 }
-
-
 
 // prepare input from the pyclone format
 process formatRND{
@@ -249,13 +256,13 @@ edited_files
 process merge {
     publishDir 'results/'
 
-    tag "${prefix}"
+    tag "${id}"
 
     input:
-    set prefix, file(edited_files) from grouped_files
+    set id, file(edited_files) from grouped_files
 
     output:
-    file '*.randomized.tsv' into final_file 
+    set id, file('*.randomized.tsv') into randomized_files 
 
     script:
     """
@@ -276,4 +283,14 @@ process merge {
     """
 }
 
+if( params.clonal ) {
+    boosting_ch = results_stratification_strand_clonality
+}
+else {
+    println "This option is still not implemented"
+}
+
+samples_boosting_ch = boosting_ch.join(randomized_files)
+
+samples_boosting_ch.subscribe{println it}
 
