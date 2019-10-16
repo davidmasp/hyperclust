@@ -294,7 +294,7 @@ samples_boosting_ch = boosting_ch.join(randomized_files)
 
 process clusterCallingBoost {
     tag "$sampleId - clustmut boost"
-    publishDir "${params.outdir}/randommut", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/clustmut", mode: 'copy', overwrite: true
     input:
     set sampleId, file(boostingPath), file(samplePath) from samples_boosting_ch
     output:
