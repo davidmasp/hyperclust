@@ -290,8 +290,9 @@ else {
     println "This option is still not implemented"
 }
 
-
+randomized_files.subscribe{println it}
+/*
 samples_boosting_ch = boosting_ch.join(randomized_files)
 
 samples_boosting_ch.subscribe{println it}
-
+*/
