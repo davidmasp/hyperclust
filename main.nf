@@ -284,7 +284,7 @@ process merge {
 }
 
 randomized_files.subscribe{println it}
-
+/*
 if( params.clonal ) {
     boosting_ch = results_stratification_strand_clonality
 }
