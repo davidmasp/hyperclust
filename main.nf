@@ -137,9 +137,8 @@ process computeStratification {
 }
 
 
-/*
- * prepare input from the pyclone format
- */
+
+// prepare input from the pyclone format
 process formatRND{
     publishDir "TMP/"
     input: 
@@ -157,9 +156,8 @@ process formatRND{
     """
 }
 
-/*
- * serialize the input genome
- */
+
+// serialize the input genome
 process serialize_genome {
     publishDir "TMP/"
     conda '/g/strcombio/fsupek_home/dmas/ENV/py36'
@@ -178,48 +176,49 @@ process serialize_genome {
     """
 }
 
-/*
- * Remove duplicated positions
- */
+
+// Remove duplicated positions
+
 process rmdup {
     publishDir 'TMP/'  
 
     tag "${big_file_dups}"
 
     input:
-    file big_file_dups from mutsfiles
+    set id, file(big_file_dups) from mutsfiles
     file available from available_chromosomes
 
     output:
-    file "${big_file_dups.baseName}_rmdup.tsv" into bigfiles_rmdup
+    set id, file("${big_file_dups.baseName}_rmdup.tsv") into bigfiles_rmdup
 
     """
     egrep -f $available $big_file_dups | sort -k7,7 -k1,1 -k2n,2 -k5,5  | uniq > ${big_file_dups.baseName}_rmdup.tsv
     """
 }
 
-/*
- * Split input mut files
- */
+// Split input mut files
 process split {
     publishDir 'TMP/'  
 
     tag "${big_file}"
 
     input:
-    file big_file from bigfiles_rmdup
+    set id, file(big_file) from bigfiles_rmdup
 
     output:
-    file "${big_file}*" into split_files mode flatten
+    set id, file("${big_file}*") into split_files mode flatten
 
     """
     split -d -l ${params.batchsize} $big_file $big_file
     """
 } // the second bigfile here is to work as prefix!
 
+split_files.subscribe{println it}
+
+
+
 /*
- * Randomize splited file
- */
+//Randomize splited file
 process randomize {
     publishDir 'TMP/' 
     label 'py36'
@@ -238,19 +237,18 @@ process randomize {
     python -m randommut -M randomize -g ${genome} -m ${partial} -a ${params.assembly} -o ${partial}.randomized -t ${params.times} -w ${params.ws} -b ${params.intraBS}
     """
 }
+ 
 
-/*
- * group back the channel
- */
+//group back the channel
+
 edited_files
   .map { file -> tuple( file.name.toString() - ~/([0-9]+)?(\.randomized)?$/ , file) }
   .groupTuple()
   .set { grouped_files }
 
 
-/*
- * merge back output files 
- */
+
+// merge back output files 
 process merge {
     publishDir 'results/'
 
@@ -280,5 +278,5 @@ process merge {
     done
     """
 }
-
+ */
 
