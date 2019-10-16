@@ -85,7 +85,7 @@ process formatVCF{
 pyclone_format_ch.into{pyclone_master_ch; stratification_master_ch;  samples2_ch}
 
 process pyClone{
-    publishDir "$params.outdir"
+    publishDir "${params.outdir}/pyclone"
     label 'pyClone'
 
     input:
@@ -254,7 +254,7 @@ edited_files
 
 // merge back output files 
 process merge {
-    publishDir 'results/'
+    publishDir "${params.outdir}/randommut"
 
     tag "${id}"
 
@@ -283,8 +283,6 @@ process merge {
     """
 }
 
-randomized_files.subscribe{println it}
-/*
 if( params.clonal ) {
     boosting_ch = results_stratification_strand_clonality
 }
@@ -292,9 +290,28 @@ else {
     println "This option is still not implemented"
 }
 
-
-/*
 samples_boosting_ch = boosting_ch.join(randomized_files)
 
-samples_boosting_ch.subscribe{println it}
-*/
+process clusterCallingBoost {
+    tag "$sampleId - clustmut boost"
+    publishDir "${params.outdir}/randommut", mode: 'copy', overwrite: true
+    input:
+    set sampleId, file(boostingPath), file(samplePath) from samples_boosting_ch
+    output:
+    file "${sampleId}_strandClonality_distance_mutlist.txt" into cluster_calls_mlist_boost
+    file "${sampleId}_strandClonality_distance_VRanges.rds" into cluster_calls_boost
+    file "${sampleId}_strandClonality_plot.pdf" 
+    
+    script:
+    """
+    clustmut distance -i . \
+            --glob "*${samplePath}" \
+            --recursive \
+            -o "${sampleId}_strandClonality" \
+            -N 1 \
+            -b ${boostingPath} \
+            -Vlv
+    """
+}
+
+
