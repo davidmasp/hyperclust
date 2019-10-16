@@ -291,8 +291,8 @@ else {
 }
 
 boosting_ch.subscribe{println it}
-
+/*
 samples_boosting_ch = boosting_ch.join(randomized_files)
 
 samples_boosting_ch.subscribe{println it}
-
+*/
