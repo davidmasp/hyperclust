@@ -183,29 +183,35 @@ ggsave(filename = glue::glue("clonality_plots/{sname}_clonality_ratio.pdf"),
          device = "pdf")
 
 # save results ==================
-res_df$mutation_id %>% stringr::str_split(":") -> mId_list
+fs::dir_create("clonality_results")
 
+# we need this to repaste the sample name in the middle of the next 
+# id that is recognised by clustmut. This is a small design flaw. 
+# maybe I should open an issue
+res_df$mutation_id %>% stringr::str_split(":") -> mId_list
+seqname_vec = mId_list %>% purrr::map_chr(1)
+start_vec = mId_list %>% purrr::map_chr(2)
 ref_vec = mId_list %>% purrr::map_chr(3)
 alt_vec = mId_list %>% purrr::map_chr(4)
 
+mid_vec = glue::glue("{seqname_vec}:{start_vec}:{sname}:{ref_vec}:{alt_vec}")
 y = res_df
-
-fs::dir_create("clonality_results")
 
 clonality = glue::glue("clonality{y$classification}")
 
+# pair + clonality
 pair = ifelse(ref_vec %in% c("C","G"),yes = "S",no = "W")
-string_code = glue::glue("{y$mutation_id}_{clonality}{pair}")
+string_code = glue::glue("{mid_vec}_{clonality}{pair}")
 readr::write_lines(string_code,
                        path = glue::glue("clonality_results/{sname}_mutations_pair_clonality.txt"))
 
 # pair + strand
-string_code = glue::glue("{y$mutation_id}_{clonality}{ref_vec}")
+string_code = glue::glue("{mid_vec}_{clonality}{ref_vec}")
 readr::write_lines(string_code,
                        path = glue::glue("clonality_results/{sname}_mutations_strand_clonality.txt"))
 
-# nothing
-string_code = glue::glue("{y$mutation_id}_{clonality}")
+# only clonality
+string_code = glue::glue("{mid_vec}_{clonality}")
     readr::write_lines(string_code,
                        path = glue::glue("clonality_results/{sname}_mutations_clonality.txt"))
 
