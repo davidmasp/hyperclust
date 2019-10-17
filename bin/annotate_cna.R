@@ -123,8 +123,11 @@ cna_dat = cna_dat[!mask_na,]
 mask_cp0 =  cna_dat$major_cn == 0
 cna_dat = cna_dat[!mask_cp0,]
 
+
 if (any(mask_cp0)){
-  warning(glue::glue("Some regions removed due to CNA Major = 0"))
+  per = scales::percent(sum(mask_cp0)/length(mask_cp0))
+  warning(
+    glue::glue("Some regions {per} removed due to CNA Major = 0")) 
 }
 
 cna_gr = GRanges(seqnames = cna_dat$chromosome,
@@ -145,7 +148,14 @@ ovr = findOverlaps(query = vcf_vr,subject = cna_gr)
 # remove mutations with no available overlap
 # I check and they seem to be mutations that outside of the
 # CNA called
+ol = length(vcf_vr)
 vcf_vr = vcf_vr[queryHits(ovr)]
+el = length(vcf_vr)
+if (ol != el){
+  per = scales::percent(1-(el/ol))
+  warning(
+    glue::glue("Some mutations excluded {per} due to unmatched region")) 
+}
 
 # transform to pyClone format =============
 pyclone_df = data.frame(
