@@ -24,6 +24,37 @@ print(prefix)
 
 # function parsers --------------------------------------------------------
 
+## need to return a data.frame object with the following columns
+# chromosome
+# start
+# end
+# major_cn
+# minor_cn
+# 
+# Also NOTE that the coordinates have to be 1-based!
+
+read_tcga_strelka <- function(cna_fn){
+  dat = readr::read_tsv(
+    cna_fn,
+    col_types = cols(
+      sample = col_character(),
+      chr = col_character(),
+      startpos = col_double(),
+      endpos = col_double(),
+      nMajor = col_double(),
+      nMinor = col_double()
+      )
+    )
+
+  res = data.frame(chromosome = dat$chr,
+                    start = dat$startpos,
+                    end = dat$endpos,
+                    major_cn = dat$nMajor,
+                    minor_cn = dat$nMinor)
+
+  return(res)
+}
+
 read_hartwig <- function(cna_fn){
   dat = readr::read_tsv(cna_fn, col_types = cols(
     `#chromosome` = col_character(),
@@ -73,13 +104,14 @@ read_sanger_pcawg <- function(cna_fn) {
 
 # script ------------------------------------------------------------------
 
-cna_parsers = c("sanger_pcawg","hartwig")
+cna_parsers = c("sanger_pcawg","hartwig","tcga_strelka")
 
 stopifnot(cna_type %in% cna_parsers)
 
 cna_dat = switch (cna_type,
                   sanger_pcawg  = read_sanger_pcawg(cna_fn = cna_fn),
-                  hartwig = read_hartwig(cna_fn = cna_fn)
+                  hartwig = read_hartwig(cna_fn = cna_fn),
+                  tcga_strelka = read_tcga_strelka(cna_fn = cna_fn)
 )
 
 # some CNA have NA values

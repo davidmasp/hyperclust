@@ -3,6 +3,8 @@
 // params
 
 // A) stratifications
+// possible options
+// hartwig / pcawg_sanger / tcga_reads
 params.dataset = "hartwig"
 mode = params.dataset
 
@@ -74,9 +76,21 @@ process formatVCF{
 
         annotate_cna.R ${vcf} ${cna} ${id}.tmpFile sanger_pcawg TUMOUR
 
+        # this is not part of any channel, can be removed
         rm ${id}.tmpFile
         """
-     else
+    else if (mode == "tcga_strelka")
+        """
+        bcftools query -s TUMOR \
+                       -f '%CHROM:%POS:%REF:%ALT{0} %REF %ALT{0} %TQSS [ %DP %AU %CU %GU %TU]\n' \
+                       ${vcf} | parse_query_TCGA_strelka.awk > ${id}.tmpFile
+
+        annotate_cna.R ${vcf} ${cna} ${id}.tmpFile tcga_strelka TUMOUR
+
+        # this is not part of any channel, can be removed
+        rm ${id}.tmpFile
+        """
+    else
         error "Invalid dataset type: ${mode}"
 
 }
