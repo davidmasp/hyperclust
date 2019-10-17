@@ -85,7 +85,7 @@ process formatVCF{
                        -f '%CHROM:%POS:%REF:%ALT{0} %REF %ALT{0} %TQSS [ %DP %AU %CU %GU %TU]\n' \
                        ${vcf} | parse_query_TCGA_strelka.awk > ${id}.tmpFile
 
-        annotate_cna.R ${vcf} ${cna} ${id}.tmpFile tcga_strelka TUMOUR
+        annotate_cna.R ${vcf} ${cna} ${id}.tmpFile tcga_strelka TUMOR
 
         # this is not part of any channel, can be removed
         rm ${id}.tmpFile
