@@ -4,7 +4,7 @@
 
 // A) stratifications
 // possible options
-// hartwig / pcawg_sanger / tcga_reads
+// hartwig / pcawg_sanger / tcga_strelka
 params.dataset = "hartwig"
 mode = params.dataset
 
