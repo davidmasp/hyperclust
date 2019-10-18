@@ -57,7 +57,8 @@ process formatVCF{
         """
         # this is mixed vcf with indels
         # I should filter by PASS?
-        bcftools view -i 'TYPE="snp"' -O z -o ${id}_snp.vcf.gz ${vcf}
+        # the M is max alleles and m is min alleles
+        bcftools view -m2 -M2 -v snps -O z -o ${id}_snp.vcf.gz ${vcf}
 
         bcftools query -i 'TYPE="snp"' \
                         -s ${id} \
