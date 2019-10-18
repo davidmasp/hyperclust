@@ -19,7 +19,7 @@ compute_clonality_pyClone_format <- function(muts_df,
 
   ## compute expected VAF
   qt = (muts_df$major_cn + muts_df$minor_cn)
-  CPnorm = 2
+  CPnorm = muts_df$normal_cn
 
   Sq = apply(matrix(c(muts_df$major_cn,
                       muts_df$minor_cn),
@@ -32,6 +32,9 @@ compute_clonality_pyClone_format <- function(muts_df,
 
   muts_df$EVaf = (Sq*purity) / (2 * (1 - purity) + purity*qt)
 
+  # this was a problem with multiallelic snps
+  # fixed in b2dba5c3bab826cad1fb
+  stopifnot(any(is.na(muts_df$var_counts)))
   # for some reason this happens...
   impossible_mask = (muts_df$major_cn == muts_df$minor_cn & muts_df$minor_cn == 0)
   if (sum(impossible_mask) > 0){
@@ -105,10 +108,10 @@ opt = parse_args(OptionParser(option_list=option_list))
 
 ## here for dbug
 if (interactive()){
-  opt$inputFile = "Y:/users/dmas/data/PCAWG_MUTS/SANGER_WGS/pyClone/tmp_WD/42/92a6b8353098ed17732d02de445657/fc9404ed-1ba3-2638-e040-11ac0c484da2_pyclone_format.tsv"
-  opt$purity = 0.8
+  opt$inputFile = "CPCT02030250T_pyclone_format.tsv"
+  opt$purity = 0.92
   opt$plot = TRUE
-  opt$sampleName = "fc9404ed-1ba3-2638-e040-11ac0c484da2"
+  opt$sampleName = "CPCT02030250T"
 }
 
 
