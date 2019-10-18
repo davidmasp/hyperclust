@@ -27,7 +27,7 @@ compute_clonality_pyClone_format <- function(muts_df,
                     ncol = 2),
              1,
              max)
-  #browser()
+
   Sq[Sq == 0] = 1
 
   # this 2 should be CPnorm I think!!
@@ -35,7 +35,7 @@ compute_clonality_pyClone_format <- function(muts_df,
 
   # this was a problem with multiallelic snps
   # fixed in b2dba5c3bab826cad1fb
-  stopifnot(any(is.na(muts_df$var_counts)))
+  stopifnot(!any(is.na(muts_df$var_counts)))
   # for some reason this happens...
   impossible_mask = (muts_df$major_cn == muts_df$minor_cn & muts_df$minor_cn == 0)
   if (sum(impossible_mask) > 0){
@@ -109,17 +109,17 @@ opt = parse_args(OptionParser(option_list=option_list))
 
 ## here for dbug
 if (interactive()){
-  opt$inputFile = "CPCT02030250T_pyclone_format.tsv"
+  opt$inputFile = "CPCT02010352T_pyclone_format.tsv"
   opt$purity = 0.92
   opt$plot = TRUE
-  opt$sampleName = "CPCT02030250T"
+  opt$sampleName = "CPCT02010352T"
 }
 
 
 # imports ---------------
 library(magrittr)
 library(ggplot2)
-library(VariantAnnotation)
+suppressPackageStartupMessages(library(VariantAnnotation))
 library(genomicHelpersDMP)
 
 
