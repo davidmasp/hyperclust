@@ -30,6 +30,7 @@ compute_clonality_pyClone_format <- function(muts_df,
   #browser()
   Sq[Sq == 0] = 1
 
+  # this 2 should be CPnorm I think!!
   muts_df$EVaf = (Sq*purity) / (2 * (1 - purity) + purity*qt)
 
   # this was a problem with multiallelic snps
