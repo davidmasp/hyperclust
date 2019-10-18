@@ -168,8 +168,11 @@ res_df$classification = clonality$classification
 
 
 # OUTPUT ------------------------------------------------------------------
+print("output start")
 
-plot = data.frame(ratio = res_df$ratio,type = factor(res_df$classification)) %>%
+plot_df = data.frame(ratio = res_df$ratio,type = factor(res_df$classification))
+print(nrow(plot_df))
+plot = plot_df %>%
     ggplot(aes(x = ratio,fill = factor(type))) +
     geom_histogram(bins = 50) +
     geom_vline(xintercept = 0,linetype = "dashed") +
