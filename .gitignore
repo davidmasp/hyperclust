@@ -30,4 +30,5 @@ bin/*.dot
 *.seqz.gz*
 
 tmp_files/
+TMP/
 
