@@ -1,10 +1,10 @@
 # HyperMut
 
 HyperMut is a software for detection of somatic local hyper-mutation.
-In brief, mutations that are located closer than expected to their 
+In brief, mutations that are located closer than expected to their
 nearest neighbor (closest adjacent mutation) are considered clusters
-of mutagenesis. These clusters can have different characteristics and 
-be generated from a sort of different mutational processes. 
+of mutagenesis. These clusters can have different characteristics and
+be generated from a sort of different mutational processes.
 
 As overview of this you can check the recently published paper from our lab.
 
