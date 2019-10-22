@@ -310,12 +310,14 @@ samples_boosting_ch = boosting_ch.join(randomized_files)
 process clusterCallingBoost {
     tag "$sampleId - clustmut boost"
     publishDir "${params.outdir}/clustmut", mode: 'copy', overwrite: true
+    // 123 is returned when no available mutations are found.
+    validExitStatus 0,123
     input:
     set sampleId, file(boostingPath), file(samplePath) from samples_boosting_ch
     output:
-    file "${sampleId}_strandClonality_distance_mutlist.txt" into cluster_calls_mlist_boost
-    file "${sampleId}_strandClonality_distance_VRanges.rds" into cluster_calls_boost
-    file "${sampleId}_strandClonality_plot.pdf" 
+    file "${sampleId}_strandClonality_distance_mutlist.txt" optional true into  cluster_calls_mlist_boost
+    file "${sampleId}_strandClonality_distance_VRanges.rds" optional true into  cluster_calls_boost
+    file "${sampleId}_strandClonality_plot.pdf" optional true 
     
     script:
     """
@@ -328,5 +330,3 @@ process clusterCallingBoost {
             -Vlv
     """
 }
-
-
