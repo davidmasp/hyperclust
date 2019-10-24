@@ -69,6 +69,7 @@ process formatVCF{
         annotate_cna.R ${id}_snp.vcf.gz ${cna} ${id}.tmpFile hartwig ${id}
 
         rm ${id}.tmpFile
+        rm ${id}_snp.vcf.gz
         """
     else if (mode == "pcawg_sanger")
         """
@@ -88,10 +89,11 @@ process formatVCF{
                        -f '%CHROM:%POS:%REF:%ALT{0} %REF %ALT{0} %TQSS [ %DP %AU %CU %GU %TU]\n' \
                        ${id}_snp.vcf.gz | parse_query_TCGA_strelka.awk > ${id}.tmpFile
 
-        annotate_cna.R ${vcf} ${cna} ${id}.tmpFile tcga_strelka TUMOR
+        annotate_cna.R ${id}_snp.vcf.gz ${cna} ${id}.tmpFile tcga_strelka TUMOR
 
         # this is not part of any channel, can be removed
         rm ${id}.tmpFile
+        rm ${id}_snp.vcf.gz
         """
     else
         error "Invalid dataset type: ${mode}"
