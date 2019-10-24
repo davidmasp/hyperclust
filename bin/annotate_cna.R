@@ -120,7 +120,7 @@ cna_dat = cna_dat[!mask_na,]
 
 # pyClone also doesn't like CPmajor = 0, this should be a pretty rare
 # case so I also remove it.
-mask_cp0 =  cna_dat$major_cn == 0
+mask_cp0 =  cna_dat$major_cn == 0 | is.na(cna_dat$major_cn)
 cna_dat = cna_dat[!mask_cp0,]
 
 
