@@ -82,9 +82,11 @@ process formatVCF{
         """
     else if (mode == "tcga_strelka")
         """
+        bcftools view -m2 -M2 -v snps -O z -o ${id}_snp.vcf.gz ${vcf}
+
         bcftools query -s TUMOR \
                        -f '%CHROM:%POS:%REF:%ALT{0} %REF %ALT{0} %TQSS [ %DP %AU %CU %GU %TU]\n' \
-                       ${vcf} | parse_query_TCGA_strelka.awk > ${id}.tmpFile
+                       ${id}_snp.vcf.gz | parse_query_TCGA_strelka.awk > ${id}.tmpFile
 
         annotate_cna.R ${vcf} ${cna} ${id}.tmpFile tcga_strelka TUMOR
 
