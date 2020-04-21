@@ -1,5 +1,7 @@
 # hyperClust
 
+**WIP WARNING**
+
 hyperClust is a software for detection of somatic local hyper-mutation.
 In brief, mutations that are located closer than expected to their
 nearest neighbor (closest adjacent mutation) are considered clusters
