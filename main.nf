@@ -7,11 +7,8 @@
 // hartwig / pcawg_sanger / tcga_strelka
 params.dataset = "hartwig"
 mode = params.dataset
-
 params.index = "index.csv"
-
 params.stratification = true
-params.pyclone = false
 
 
 // b) randommut
@@ -96,48 +93,7 @@ process formatVCF{
 
 }
 
-
-pyclone_format_ch.into{pyclone_master_ch; stratification_master_ch;  samples2_ch}
-
-process pyClone{
-    publishDir "${params.outdir}/pyclone"
-    label 'pyClone'
-
-    input:
-    set id, file(pyclone_file), val(purity) from pyclone_master_ch
-
-    output:
-    set id, file("${id}_pyClone_loci.tsv"), file("${id}_pyClone_clusters.tsv") into results_pyclone
-
-    when:
-    params.pyclone
-
-    script:
-    """
-    # first step is to configure the analysis
-    PyClone setup_analysis \
-            --in_files ${pyclone_file} \
-            --working_dir pyclone_wd \
-            --tumour_contents ${purity} \
-            --samples ${id}
-
-    # second step is to run the analysis
-    PyClone run_analysis --config_file pyclone_wd/config.yaml
-
-    # get the summary table
-    PyClone build_table --config_file pyclone_wd/config.yaml \
-                        --out_file ${id}_pyClone_loci.tsv \
-                        --table_type loci \
-                        --max_clusters 4
-    
-    PyClone build_table --config_file pyclone_wd/config.yaml \
-                        --out_file ${id}_pyClone_clusters.tsv \
-                        --table_type cluster \
-                        --max_clusters 4
-    
-    """
-
-}
+pyclone_format_ch.into{stratification_master_ch;  samples2_ch}
 
 process computeStratification {
     publishDir "${params.outdir}/stratification"
