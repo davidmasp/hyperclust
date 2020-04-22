@@ -17,8 +17,8 @@ plus a nextflow installation
 is required, other required software can be listed here, however, installation
 of the generated conda environtment by nextflow should be sufficient.
 
-* randommut (python3 vXXX)
-* clustMut (R v3.XXX)
+* [randommut](https://github.com/davidmasp/randommut)
+* [clustMut](https://github.com/davidmasp/clustMut)
 
 ## Usage
 
