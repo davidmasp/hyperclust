@@ -15,8 +15,9 @@ Each column contains the path to:
 - `cnaFile` a file with copy number alteration data
 - `purity` a numeric value which corresponds to the tumor sample purity
 
-The CNA file should be a `.tsv` file with the columns: chromosome, start, end,
-total_cn, major_cn, minor_cn, star. The file can be obtained with tools like
+The CNA file should be a `.tsv` file with the columns: `chromosome`,
+`start`, `end`, `total_cn`, `major_cn`, `minor_cn`, `star`.
+The file can be obtained with tools like
 [ASCAT](https://github.com/Crick-CancerGenomics/ascat).
 
 As example, the index file should look like this.
