@@ -1,17 +1,59 @@
-#!~/bin/nextflow
+#!/usr/bin/env nextflow
+/*
 
-// params
+############  hyperclust ######################
 
-// A) stratifications
-// possible options
-// hartwig / pcawg_sanger / tcga_strelka
+hyperclust Pipeline.
+
+by: David Mas-Ponte
+aim: The pipeline aims to call mutation clusters in human tumors.
+Documentation: https://github.com/davidmasp/hyperclust
+*/
+
+def helpMessage() {
+    log.info"""
+    Usage:
+    The typical command for running the pipeline is as follows:
+    nextflow run davidmasp/hyperclust [OPT]
+    Mandatory arguments:
+      
+      --index [file]          index file with vcf files and the corresponding samples.
+      --genome [file]         masked fasta file to use as reference sequence.
+      -profile [str]          configuration profile.
+    Options:
+      --dataset [str]         Different parsing options for common available datasets. (hartwig, pcawg_sanger and tcga_strelka)
+      --stratification [bool] Wether or not to compute stratification for the samples
+      --batchsize [int]       randommut specific option.
+      --intraBS [int]         randommut specific option.
+      --ws [int]              randommut specific option.
+      --times [int]           randommut specific option.
+      --clonal [bool]         clustmut specific option.
+    Help:
+      --help  [bool]         Show help
+    """.stripIndent()
+}
+params.pairs = true
+params.strand = true
+params.clonal = true
+
+
+params.help = false
+// Show help message
+if (params.help) {
+    helpMessage()
+    exit 0
+}
+
+
+/*
+ * PARAMS
+ */
+
 params.dataset = "hartwig"
 mode = params.dataset
 params.index = "index.csv"
 params.stratification = true
 
-
-// b) randommut
 params.genome = "/g/strcombio/fsupek_data/users/dmas/data/ILUMINA_refseq/GRCh37/GRCh37_refseq_masked.fa"
 params.assembly = "GRCh37"
 genome = file(params.genome) // file here bc only 1!
@@ -20,12 +62,7 @@ params.intraBS = 100
 params.ws = 500000
 params.times = 50
 
-
-// c) clustmut
-// ideally the combination of these channels should make all boosts
-// TODO: add non-clonal stratification here too
-params.pairs = true
-params.strand = true
+// todo ideally the combination of these channels should make all boosts
 params.clonal = true
 
 // prepare master channel
