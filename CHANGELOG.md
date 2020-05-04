@@ -14,6 +14,21 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
 
+## [0.1.1](http://fsupeksvr.irbbarcelona.pcb.ub.es/gitlab/dmas/hypermut/tags/0.1.1) - 2020 - 05 - 04
+
+### Added
+
+- Added some template features from cookiecutter
+- First version of an extensive documentation.
+
+### Changed
+
+- cleaning
+
+### Removed
+
+- pyclone support
+
 
 ## [0.1.0](http://fsupeksvr.irbbarcelona.pcb.ub.es/gitlab/dmas/hypermut/tags/0.1.0) - 2019 - 10 - 21
 
