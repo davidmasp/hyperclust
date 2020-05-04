@@ -103,6 +103,7 @@ process formatVCF{
         annotate_cna.R ${id}_snp.vcf.gz ${cna} ${id}.tmpFile hartwig ${id}
 
         rm ${id}.tmpFile
+        rm ${id}_snp.vcf.gz
         """
     else if (mode == "pcawg_sanger")
         """
@@ -116,14 +117,17 @@ process formatVCF{
         """
     else if (mode == "tcga_strelka")
         """
+        bcftools view -m2 -M2 -v snps -O z -o ${id}_snp.vcf.gz ${vcf}
+
         bcftools query -s TUMOR \
                        -f '%CHROM:%POS:%REF:%ALT{0} %REF %ALT{0} %TQSS [ %DP %AU %CU %GU %TU]\n' \
-                       ${vcf} | parse_query_TCGA_strelka.awk > ${id}.tmpFile
+                       ${id}_snp.vcf.gz | parse_query_TCGA_strelka.awk > ${id}.tmpFile
 
-        annotate_cna.R ${vcf} ${cna} ${id}.tmpFile tcga_strelka TUMOR
+        annotate_cna.R ${id}_snp.vcf.gz ${cna} ${id}.tmpFile tcga_strelka TUMOR
 
         # this is not part of any channel, can be removed
         rm ${id}.tmpFile
+        rm ${id}_snp.vcf.gz
         """
     else
         error "Invalid dataset type: ${mode}"
@@ -303,12 +307,14 @@ samples_boosting_ch = boosting_ch.join(randomized_files)
 process clusterCallingBoost {
     tag "$sampleId - clustmut boost"
     publishDir "${params.outdir}/clustmut", mode: 'copy', overwrite: true
+    // 123 is returned when no available mutations are found.
+    validExitStatus 0,123
     input:
     set sampleId, file(boostingPath), file(samplePath) from samples_boosting_ch
     output:
-    file "${sampleId}_strandClonality_distance_mutlist.txt" into cluster_calls_mlist_boost
-    file "${sampleId}_strandClonality_distance_VRanges.rds" into cluster_calls_boost
-    file "${sampleId}_strandClonality_plot.pdf" 
+    file "${sampleId}_strandClonality_distance_mutlist.txt" optional true into  cluster_calls_mlist_boost
+    file "${sampleId}_strandClonality_distance_VRanges.rds" optional true into  cluster_calls_boost
+    file "${sampleId}_strandClonality_plot.pdf" optional true 
     
     script:
     """
@@ -321,5 +327,3 @@ process clusterCallingBoost {
             -Vlv
     """
 }
-
-
