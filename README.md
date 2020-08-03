@@ -1,6 +1,7 @@
 # hyperClust
 
-**WIP WARNING**
+This software is described in detail in our published
+[analysis](https://www.nature.com/articles/s41588-020-0674-6).
 
 ## Overview
 
